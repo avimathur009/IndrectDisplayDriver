@@ -6,6 +6,13 @@
 #include <conio.h>
 #include <wrl.h>
 
+//HSWDEVICE is a typedef for a 'handle' data-type: special type of pointer that is used to interact with Software device in the Windows operating system
+//HRESULT is a data type that represents the completion status of a function: 32 bit value (devided into 3 parts)
+//PVOID is a pointer to a generic type: typedef for the void * type (used when we don't want to change function, when not sure of the data type to pass)
+//PCWSTR is a type that represents a pointer to a constant wide character string: stored using 16-bit characters
+//_In_ : Passed by Value and Value can't be changes by function
+//_In_opt_ : Passed by Value and Value may also be Null
+
 VOID WINAPI
 CreationCallback(
     _In_ HSWDEVICE hSwDevice,
@@ -14,28 +21,40 @@ CreationCallback(
     _In_opt_ PCWSTR pszDeviceInstanceId
     )
 {
-    HANDLE hEvent = *(HANDLE*) pContext;
+    //getting the event handle from context pointer by derefrencing
+    //event handle for? the event handle for the software device that was created (IDD??)
+    HANDLE hEvent = *(HANDLE*) pContext; 
 
     SetEvent(hEvent);
+
+    //Indicating unused parameters
     UNREFERENCED_PARAMETER(hSwDevice);
     UNREFERENCED_PARAMETER(hrCreateResult);
     UNREFERENCED_PARAMETER(pszDeviceInstanceId);
 }
-
+//Using the standard calling convention: __cdecl (Is explicit specification necissary?)
 int __cdecl main(int argc, wchar_t *argv[])
 {
     UNREFERENCED_PARAMETER(argc);
     UNREFERENCED_PARAMETER(argv);
 
+    //creates a handle to an event object (See 4 parameters) 
     HANDLE hEvent = CreateEvent(nullptr, FALSE, FALSE, nullptr);
+
+    //HSWDEVICE type is a handle to a software device object (used to represent hardware devices in the Win os)
     HSWDEVICE hSwDevice;
+
+    //used to provide information about a software device object when it is created (Version, DeviceObjectName, DeviceObjectDescription, etc.)
     SW_DEVICE_CREATE_INFO createInfo = { 0 };
+
+    //PCWSTR type is used to represent strings that are used by Windows APIs (win OS requires arguments to be passed as these types)
     PCWSTR description = L"Idd Sample Driver";
 
     // These match the Pnp id's in the inf file so OS will load the driver when the device is created    
-    PCWSTR instanceId = L"IddSampleDriver";
-    PCWSTR hardwareIds = L"IddSampleDriver\0\0";
-    PCWSTR compatibleIds = L"IddSampleDriver\0\0";
+    // SEE "IddSampleDriver.inf" file, line #20 (it is hard-coded for now, but need to edit that)
+    PCWSTR instanceId = L"ChromiumMultiDisplayDriver";
+    PCWSTR hardwareIds = L"ChromiumMultiDisplayDriver\0\0";
+    PCWSTR compatibleIds = L"ChromiumMultiDisplayDriver\0\0";
 
     createInfo.cbSize = sizeof(createInfo);
     createInfo.pszzCompatibleIds = compatibleIds;

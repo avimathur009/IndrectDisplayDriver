@@ -15,6 +15,14 @@ Environment:
 
 --*/
 
+/*++
+
+WINDOWS SPECIFIC 'typedef' DATA-TYPES:
+    
+    1.) DWORD: typedef of unsigned long integer --> 32 - bit unsigned integer
+
+--*/
+
 #include "Driver.h"
 #include "Driver.tmh"
 
@@ -24,11 +32,14 @@ using namespace Microsoft::WRL;
 
 #pragma region SampleMonitors
 
-static constexpr DWORD IDD_SAMPLE_MONITOR_COUNT = 3; // If monitor count > ARRAYSIZE(s_SampleMonitors), we create edid-less monitors
+//Specifies Sample Monitors, which can't be changed -->  **TO DO**
+static constexpr DWORD IDD_SAMPLE_MONITOR_COUNT = 3; 
 
-// Default modes reported for edid-less monitors. The first mode is set as preferred
+//IndirectSampleMonitor: namespace that contains classes and structures related to sample monitors
+//Defining default mode of sample monitors which are hard-coded currently --> **TO DO**
 static const struct IndirectSampleMonitor::SampleMonitorMode s_SampleDefaultModes[] = 
 {
+    //{width, height, refreshRate: no. of times per second the monitor updates image on the screen}
     { 1920, 1080, 60 },
     { 1600,  900, 60 },
     { 1024,  768, 75 },
@@ -39,6 +50,7 @@ static const struct IndirectSampleMonitor s_SampleMonitors[] =
 {
     // Modified EDID from Dell S2719DGF
     {
+         //pointer to an EDID structure: Extended Display Identification Data (several parts represent info about the monotor
         {
             0x00,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0x00,0x10,0xAC,0xE6,0xD0,0x55,0x5A,0x4A,0x30,0x24,0x1D,0x01,
             0x04,0xA5,0x3C,0x22,0x78,0xFB,0x6C,0xE5,0xA5,0x55,0x50,0xA0,0x23,0x0B,0x50,0x54,0x00,0x02,0x00,
@@ -48,6 +60,7 @@ static const struct IndirectSampleMonitor s_SampleMonitors[] =
             0x53,0x32,0x37,0x31,0x39,0x44,0x47,0x46,0x0A,0x20,0x20,0x20,0x20,0x00,0x00,0x00,0xFD,0x00,0x28,
             0x9B,0xFA,0xFA,0x40,0x01,0x0A,0x20,0x20,0x20,0x20,0x20,0x20,0x00,0x2C
         },
+         //sample monitor mode
         {
             { 2560, 1440, 144 },
             { 1920, 1080,  60 },
@@ -57,6 +70,7 @@ static const struct IndirectSampleMonitor s_SampleMonitors[] =
     },
     // Modified EDID from Lenovo Y27fA
     {
+        //pointer to an EDID structure: Extended Display Identification Data (several parts represent info about the monotor
         {
             0x00,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0x00,0x30,0xAE,0xBF,0x65,0x01,0x01,0x01,0x01,0x20,0x1A,0x01,
             0x04,0xA5,0x3C,0x22,0x78,0x3B,0xEE,0xD1,0xA5,0x55,0x48,0x9B,0x26,0x12,0x50,0x54,0x00,0x08,0x00,
@@ -66,6 +80,7 @@ static const struct IndirectSampleMonitor s_SampleMonitors[] =
             0x30,0x92,0xB4,0xB4,0x22,0x01,0x0A,0x20,0x20,0x20,0x20,0x20,0x20,0x00,0x00,0x00,0xFC,0x00,0x4C,
             0x45,0x4E,0x20,0x59,0x32,0x37,0x66,0x41,0x0A,0x20,0x20,0x20,0x00,0x11
         },
+         //sample monitor mode
         {
             { 3840, 2160,  60 },
             { 1600,  900,  60 },
