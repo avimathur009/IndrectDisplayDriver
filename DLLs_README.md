@@ -33,7 +33,7 @@ DLLs are used to implement device drivers in Windows:
 
 Code snippet:
 
-`extern "C" BOOL WINAPI DllMain(
+```extern "C" BOOL WINAPI DllMain(
     _In_ HINSTANCE hInstance,
     _In_ UINT dwReason,
     _In_opt_ LPVOID lpReserved)
@@ -45,7 +45,7 @@ Code snippet:
 
     // Return TRUE to indicate that the DLL was loaded or unloaded successfully.
     return TRUE;
-}`
+}```
 
 Here the main parts we need to take out of this: 
 
