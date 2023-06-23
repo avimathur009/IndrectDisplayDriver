@@ -1,19 +1,2 @@
-﻿  Building 'IddSampleDriver' with toolset 'WindowsUserModeDriver10.0' and the 'Universal' target platform.
-  Stamping x64\Debug\IddSampleDriver.inf
-  Stamping [Version] section with DriverVer=06/16/2023,14.16.36.872
-  IddSampleDriver.vcxproj -> C:\repos\IndrectDisplayDriver\x64\Debug\IddSampleDriver.dll
-  Driver is 'Universal'.
-  .........................
-  Signability test complete.
-  
-  Errors:
-  None
-  
-  Warnings:
-  None
-  
-  Catalog generation complete.
-  C:\repos\IndrectDisplayDriver\x64\Debug\IddSampleDriver\iddsampledriver.cat
-  Done Adding Additional Store
-  Successfully signed: C:\repos\IndrectDisplayDriver\x64\Debug\IddSampleDriver\iddsampledriver.cat
-  
+﻿  Driver.cpp
+C:\repos\IndrectDisplayDriver\IddSampleDriver\Driver.h(6,10): fatal  error C1083: Cannot open include file: 'wudfwdm.h': No such file or directory

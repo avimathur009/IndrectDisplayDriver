@@ -52,9 +52,9 @@ int __cdecl main(int argc, wchar_t *argv[])
 
     // These match the Pnp id's in the inf file so OS will load the driver when the device is created    
     // SEE "IddSampleDriver.inf" file, line #20 (it is hard-coded for now, but need to edit that)
-    PCWSTR instanceId = L"ChromiumMultiDisplayDriver";
-    PCWSTR hardwareIds = L"ChromiumMultiDisplayDriver\0\0";
-    PCWSTR compatibleIds = L"ChromiumMultiDisplayDriver\0\0";
+    PCWSTR instanceId = L"IddSampleDriver";
+    PCWSTR hardwareIds = L"IddSampleDriver\0\0";
+    PCWSTR compatibleIds = L"IddSampleDriver\0\0";
 
     createInfo.cbSize = sizeof(createInfo);
     createInfo.pszzCompatibleIds = compatibleIds;
