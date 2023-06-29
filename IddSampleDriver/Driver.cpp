@@ -24,7 +24,7 @@ WINDOWS SPECIFIC 'typedef' DATA-TYPES:
 --*/
 
 #include "Driver.h"
-#include "Driver.tmh"
+//#include "Driver.tmh"
 
 using namespace std;
 using namespace Microsoft::IndirectDisp;

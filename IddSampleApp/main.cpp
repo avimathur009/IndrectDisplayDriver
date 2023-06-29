@@ -66,7 +66,10 @@ int __cdecl main(int argc, wchar_t *argv[])
                                  SWDeviceCapabilitiesSilentInstall |
                                  SWDeviceCapabilitiesDriverRequired;
 
-    // Create the device
+    // Check if the enumeration was successful - Enumeration of the device is initialized? (S_OK for success)
+    // CreationCallback - responsible for the status for the actual enumeration of the device 
+    // after OS calls after PnP enumerates the device
+    // hSwDevice - pointer to the actual hardware that is created
     HRESULT hr = SwDeviceCreate(L"IddSampleDriver",
                                 L"HTREE\\ROOT\\0",
                                 &createInfo,
