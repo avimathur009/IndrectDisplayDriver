@@ -9,6 +9,6 @@ This README includes the authorized link for the 'certificate chain', essential 
 
 Here's the link to the 'certificate chain' from a Microsoft page:
 
-* Link: MicrosoftRootCertificateAuthority2011.cer
+* MicrosoftRootCertificateAuthority2011.cer
 
 Simply copy and paste this link on Google, and follow the installation steps for installing the certificate at the correct path.
