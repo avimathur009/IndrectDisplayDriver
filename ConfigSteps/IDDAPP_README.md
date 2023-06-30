@@ -1,30 +1,46 @@
-# CONFIGURATION STEPS FOR SAMPLE DRIVER #
+# CONFIGURATION STEPS FOR IDD SAMPLE APP #
 
-This file consists of a very basic, and working understanding of WDF (Window Driver Foundation) for this project. These are the major and high-level points to look out for in this README.
+This file consists of configuration steps for running IddSampleApp:
 
-* What is WDF?
-* Some Examples from the current code.
+* External Installation: SDK & WDK
+* Property Configuration for IddSampleDriver.sln
 
-NOTE: This README only gives a working understanding of WDF for this project, however if you are curious about WDF you may look it up here:
-https://learn.microsoft.com/en-us/windows-hardware/drivers/wdf/using-the-framework-to-develop-a-driver
-
-
-## What is WDF? ##
-
-It is a set of software tools and libraries that Microsoft provides to help developers write device drivers for Windows operating systems. We can say that WDF is a Framework. WDF consists of several features inbuilt with it:
-
-* A consistent object model for device (driver) objects, queues, and other driver components.
-* A model which consists of both Synchronous and Asynchronous I/O.
-* A device-specific pnp (plug and play) model to make it easier to add a new device easily.
-* Tools and Utility for developers to debug and troubleshoot drivers.
-
-WDF has two layers consisting in it:
-
-* KMDF: Kernel-mode Driver Framework - More privileged 
-* UMDF: User-mode Driver Framework - Less privileged
+NOTE: This README only gives the configuration steps and does not tell much about IddSampleApp. You can see about it more in the codebase here:
+%PATH TO REPO%\IndrectDisplayDriver\IddSampleApp\IddSampleDriver.sln
 
 
-## Some Examples from the current code ##
+## External Installation: SDK & WDK ##
 
-* WDF_DEVICE_INIT_CONTEXT: A struct to initialize the properties of a device driver.
-* EVT_WDF_DEVICE_D0_ENTRY: Event is raised when the driver device is put to D0 state.
+The main External installations required for running the IddSampleApp are Windows SDK (Software Development Kit) and WDK (Windows Driver Kit):
+
+* Windows SDK: We need to use Windows SDK (10.0.22621) for Windows 11 which provides the latest headers, libraries, metadata, and tools for building Windows applications
+* WDK: We need to use Windows Driver Kit (WDK) 11 which helps build, test, and deploy the drivers. The WDK helps in integrating driver development environment to integrate with Visual Studios.
+
+Installation Links for Windows SDK & WDK:
+
+* Windows SDK: https://developer.microsoft.com/en-us/windows/downloads/windows-sdk/
+* WDK: https://learn.microsoft.com/en-us/windows-hardware/drivers/download-the-wdk
+
+Along with these installations, it is necessary to install some "Individual Components" using Visual Studios Installer. Here's the list of those components required to be installed:
+
+* MSVC v143 - VS 2022 C++ ARM build tools (Latest) 
+* MSVC v143 - VS 2022 C++ x64/x86 Spectre-mitigated libs (Latest)
+* Windows Driver Kit (This is optional as WDK may already been installed using external installation)
+
+
+## Property Configuration for IddSampleDriver.sln ##
+
+Now as the external installtions are completed, there are several changes in the Property Configurations that needs to be set. Here are the steps to have the correct Property Configuration:
+
+* Go on the following path in the current repo: $cd %PATH TO REPO%\IndrectDisplayDriver\IddSampleDriver.sln --- OR --- Double click on the 'IddSampleDriver.sln' solution   
+* Now we have two .sln files, out of which we focus on 'IddSampleApp.sln'
+* Right click on the 'IddSampleApp.sln', and select 'Properties'
+
+Follow this to select on the correct Property settings: 
+* Property -> Configuration Properties -> General -> Configuration Type : Choose 'Application (.exe)'
+* Property -> Configuration Properties -> General -> Windows SDK Version : Choose '10.0 (latest installed version)'
+* Property -> Configuration Properties -> General -> Platform Toolset : Choose 'WindowsUserModeDriver10.0'
+
+Press "Apply" and click "OK" to apply these changes for this .sln file
+
+
