@@ -11,7 +11,7 @@ This file consists of steps for running IddSampleApp & IddSampleDriver:
 
 Here is the basic overview of what to do, to run the 'IddSampleApp.exe':
 
-* We may only achieve this if all the steps in 'Configuration' and 'BuildingAndRunning\Building' are followed properly and no errors are found.
+* We can only achieve this if all the steps in 'Configuration' and 'BuildingAndRunning\Building' are followed properly and no errors are found.
 * Then we need to install the Idd Driver which is given by a .inf file 
 * Once the first two steps are done, we need to run the 'IddSampleApp.exe'
 
