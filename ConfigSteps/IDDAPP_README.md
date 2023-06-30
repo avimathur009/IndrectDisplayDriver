@@ -33,8 +33,8 @@ Along with these installations, it is necessary to install some "Individual Comp
 Now as the external installtions are completed, there are several changes in the Property Configurations that needs to be set. Here are the steps to have the correct Property Configuration:
 
 * Go on the following path in the current repo: $cd %PATH TO REPO%\IndrectDisplayDriver\IddSampleDriver.sln --- OR --- Double click on the 'IddSampleDriver.sln' solution   
-* Now we have two .sln files, out of which we focus on 'IddSampleApp.sln'
-* Right click on the 'IddSampleApp.sln', and select 'Properties'
+* Now we have two .sln files, out of which we focus on 'IddSampleApp'
+* Right click on the 'IddSampleApp', and select 'Properties'
 
 Follow this to select on the correct Property settings: 
 * Property -> Configuration Properties -> General -> Configuration Type : Choose 'Application (.exe)'
