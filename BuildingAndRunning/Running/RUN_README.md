@@ -39,4 +39,5 @@ Once they are done:
 * IMPORTANT: Select the option 'Run as administrator' and the 'IddSampleApp.exe' will hence run.
 
 NOTE: 'Run as administrator' is the MOST IMPORTANT part of this process as this App will not run otherwise. 
+
 REASON: 'IddSampleApp' file in the 'IddSampleDriver.sln' has a method called 'SwDeviceCreate()' which requires the administrator controll to be run, and otherwise the App will not run
