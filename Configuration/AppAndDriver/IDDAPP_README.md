@@ -42,5 +42,3 @@ Follow this to select on the correct Property settings:
 * Property -> Configuration Properties -> General -> Platform Toolset : Choose 'WindowsUserModeDriver10.0'
 
 Press "Apply" and click "OK" to apply these changes for this .sln file
-
-
