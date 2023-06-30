@@ -3,7 +3,7 @@
 This file consists of configuration steps for running IddSampleApp:
 
 * External Installation: SDK & WDK
-* Property Configuration for IddSampleDriver.sln
+* Property Configuration for IddSampleApp.sln
 
 NOTE: This README only gives the configuration steps and does not tell much about IddSampleApp. You can see about it more in the codebase here:
 %PATH TO REPO%\IndrectDisplayDriver\IddSampleApp\IddSampleDriver.sln
@@ -28,7 +28,7 @@ Along with these installations, it is necessary to install some "Individual Comp
 * Windows Driver Kit (This is optional as WDK may already been installed using external installation)
 
 
-## Property Configuration for IddSampleDriver.sln ##
+## Property Configuration for IddSampleApp.sln ##
 
 Now as the external installtions are completed, there are several changes in the Property Configurations that needs to be set. Here are the steps to have the correct Property Configuration:
 
