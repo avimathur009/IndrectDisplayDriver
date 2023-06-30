@@ -3,7 +3,7 @@
 This file consists of configuration steps for running IddSampleApp:
 
 * External Installation: SDK & WDK
-* Property Configuration for IddSampleApp.sln
+* Property Configuration for IddSampleApp
 
 NOTE: This README only gives the configuration steps and does not tell much about IddSampleApp. You can see about it more in the codebase here:
 %PATH TO REPO%\IndrectDisplayDriver\IddSampleApp\IddSampleDriver.sln
