@@ -1,6 +1,6 @@
 ﻿  Building 'IddSampleDriver' with toolset 'WindowsUserModeDriver10.0' and the 'Universal' target platform.
   Stamping x64\Debug\IddSampleDriver.inf
-  Stamping [Version] section with DriverVer=06/29/2023,18.42.4.476
+  Stamping [Version] section with DriverVer=07/02/2023,18.22.25.964
   Driver.cpp
      Creating library C:\repos\IndrectDisplayDriver\x64\Debug\IddSampleDriver.lib and object C:\repos\IndrectDisplayDriver\x64\Debug\IddSampleDriver.exp
   IddSampleDriver.vcxproj -> C:\repos\IndrectDisplayDriver\x64\Debug\IddSampleDriver.dll
@@ -8,7 +8,7 @@
   Successfully signed: C:\repos\IndrectDisplayDriver\x64\Debug\IddSampleDriver.dll
   
   Driver is 'Universal'.
-  ........................
+  .........................
   Signability test complete.
   
   Errors:
