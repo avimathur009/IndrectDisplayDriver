@@ -21,7 +21,7 @@ Here is the basic overview of what to do, to run the 'IddSampleApp.exe':
 First we need to make sure that all the steps given in 'Configuration' and 'BuildingAndRunning\Building' are followed properly. 
 Once they are done: 
 
-* First we need to go to the project directory: %PATH TO REPO%\IndrectDisplayDriver\x64\Debug
+* First we need to go to the project directory: %PATH TO REPO%\IndrectDisplayDriver\x64\Debug\IddSampleDriver
 * Then we need to locate the .inf file called 'IddSampleDriver.inf' in the given directory
 * Select and right - click the .inf file, and click 'Install'
 
