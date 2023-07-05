@@ -24,7 +24,7 @@ WINDOWS SPECIFIC 'typedef' DATA-TYPES:
 --*/
 
 #include "Driver.h"
-//#include "Driver.tmh"
+#include "Driver.tmh"
 
 using namespace std;
 using namespace Microsoft::IndirectDisp;
@@ -233,6 +233,8 @@ extern "C" NTSTATUS DriverEntry(
     {
         return Status;
     }
+    WPP_INIT_TRACING(pDriverObject, pRegistryPath);
+    // TODO: Call WPP_CLEANUP somewhere..
 
     return Status;
 }
@@ -241,6 +243,7 @@ extern "C" NTSTATUS DriverEntry(
 _Use_decl_annotations_
 NTSTATUS IddSampleDeviceAdd(WDFDRIVER Driver, PWDFDEVICE_INIT pDeviceInit)
 {
+    TraceEvents(TRACE_LEVEL_ERROR, TRACE_DRIVER , "IddSampleDeviceAdd");
     NTSTATUS Status = STATUS_SUCCESS;
 
     //specify the power callbacks for WDF driver
