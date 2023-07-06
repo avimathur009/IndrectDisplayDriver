@@ -1,2 +1,0 @@
-C:\repos\IndrectDisplayDriver\x64\Debug\IddSampleDriver.dll.lastcodeanalysissucceeded
-C:\repos\IndrectDisplayDriver\IddSampleDriver\x64\Debug\NativeCodeAnalysis.read.1.tlog
