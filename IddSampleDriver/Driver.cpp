@@ -15,16 +15,12 @@ Environment:
 
 --*/
 
-/*++
-
-WINDOWS SPECIFIC 'typedef' DATA-TYPES:
-    
-    1.) DWORD: typedef of unsigned long integer --> 32 - bit unsigned integer
-
---*/
-
 #include "Driver.h"
 #include "Driver.tmh"
+#include <cfgmgr32.h>
+#include <initguid.h>
+#include <Devpropdef.h>
+
 
 using namespace std;
 using namespace Microsoft::IndirectDisp;
@@ -32,25 +28,24 @@ using namespace Microsoft::WRL;
 
 #pragma region SampleMonitors
 
-//Specifies Sample Monitors, which can't be changed -->  **TO DO**
-static constexpr DWORD IDD_SAMPLE_MONITOR_COUNT = 3; 
+DEFINE_DEVPROPKEY (CustomProp, 0xde5c254e, 0xab1c, 0xeffd, 0x80, 0x20, 0x67, 0xd1, 0x46, 0xa8,0x50,0xe0,2);
 
-//IndirectSampleMonitor: namespace that contains classes and structures related to sample monitors
-//Defining default mode of sample monitors which are hard-coded currently --> **TO DO**
+
+static constexpr DWORD IDD_SAMPLE_MONITOR_COUNT = 3; // If monitor count > ARRAYSIZE(s_SampleMonitors), we create edid-less monitors
+
+// Default modes reported for edid-less monitors. The first mode is set as preferred
 static const struct IndirectSampleMonitor::SampleMonitorMode s_SampleDefaultModes[] = 
 {
-    //{width, height, refreshRate: no. of times per second the monitor updates image on the screen}
     { 1920, 1080, 60 },
     { 1600,  900, 60 },
     { 1024,  768, 75 },
 };
 
-// FOR SAMPLE PURPOSES ONLY, Static info about monitors that will be reported to OS ***SEE LINE #781 & #835***
+// FOR SAMPLE PURPOSES ONLY, Static info about monitors that will be reported to OS
 static const struct IndirectSampleMonitor s_SampleMonitors[] =
 {
     // Modified EDID from Dell S2719DGF
     {
-         //pointer to an EDID structure: Extended Display Identification Data (several parts represent info about the monotor
         {
             0x00,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0x00,0x10,0xAC,0xE6,0xD0,0x55,0x5A,0x4A,0x30,0x24,0x1D,0x01,
             0x04,0xA5,0x3C,0x22,0x78,0xFB,0x6C,0xE5,0xA5,0x55,0x50,0xA0,0x23,0x0B,0x50,0x54,0x00,0x02,0x00,
@@ -60,7 +55,6 @@ static const struct IndirectSampleMonitor s_SampleMonitors[] =
             0x53,0x32,0x37,0x31,0x39,0x44,0x47,0x46,0x0A,0x20,0x20,0x20,0x20,0x00,0x00,0x00,0xFD,0x00,0x28,
             0x9B,0xFA,0xFA,0x40,0x01,0x0A,0x20,0x20,0x20,0x20,0x20,0x20,0x00,0x2C
         },
-         //sample monitor mode
         {
             { 2560, 1440, 144 },
             { 1920, 1080,  60 },
@@ -70,7 +64,6 @@ static const struct IndirectSampleMonitor s_SampleMonitors[] =
     },
     // Modified EDID from Lenovo Y27fA
     {
-        //pointer to an EDID structure: Extended Display Identification Data (several parts represent info about the monotor
         {
             0x00,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0x00,0x30,0xAE,0xBF,0x65,0x01,0x01,0x01,0x01,0x20,0x1A,0x01,
             0x04,0xA5,0x3C,0x22,0x78,0x3B,0xEE,0xD1,0xA5,0x55,0x48,0x9B,0x26,0x12,0x50,0x54,0x00,0x08,0x00,
@@ -80,7 +73,6 @@ static const struct IndirectSampleMonitor s_SampleMonitors[] =
             0x30,0x92,0xB4,0xB4,0x22,0x01,0x0A,0x20,0x20,0x20,0x20,0x20,0x20,0x00,0x00,0x00,0xFC,0x00,0x4C,
             0x45,0x4E,0x20,0x59,0x32,0x37,0x66,0x41,0x0A,0x20,0x20,0x20,0x00,0x11
         },
-         //sample monitor mode
         {
             { 3840, 2160,  60 },
             { 1600,  900,  60 },
@@ -136,32 +128,18 @@ static IDDCX_TARGET_MODE CreateIddCxTargetMode(DWORD Width, DWORD Height, DWORD 
 
 #pragma endregion
 
-//BEGINNING OF LISTING OF EVENTS THAT OCCUR FROM THE DRIVER LODING AND UNLOADING
-
-//It is called by the operating system when the driver is loaded, and marks the entry to other entry points
 extern "C" DRIVER_INITIALIZE DriverEntry;
 
-//WDF events:
-//event is raised when a new device is added to the driver
 EVT_WDF_DRIVER_DEVICE_ADD IddSampleDeviceAdd;
-//event is raised when a device is put into the D0 state
 EVT_WDF_DEVICE_D0_ENTRY IddSampleDeviceD0Entry;
 
-//IDD events:
-//event is raised when an adapter is initialized
 EVT_IDD_CX_ADAPTER_INIT_FINISHED IddSampleAdapterInitFinished;
-//event is raised when an adapter commits its modes*** IMPORTANT - drivers can ensure that the modes for an adapter are valid
 EVT_IDD_CX_ADAPTER_COMMIT_MODES IddSampleAdapterCommitModes;
 
-//More IDD events: ***IMPORTANT
 EVT_IDD_CX_PARSE_MONITOR_DESCRIPTION IddSampleParseMonitorDescription;
 EVT_IDD_CX_MONITOR_GET_DEFAULT_DESCRIPTION_MODES IddSampleMonitorGetDefaultModes;
 EVT_IDD_CX_MONITOR_QUERY_TARGET_MODES IddSampleMonitorQueryModes;
 
-//Further More IDD events: ***IMPORTANT - SWAP CHAIN
-//SWAP CHAIN: A swap chain is a data structure that is used to manage the display of frames on a monitor
-//A swap chain consists of a series of back buffers, which are images that are used to store frames.
-//The operating system will present the frames from the back buffers to the monitor one at a time.
 EVT_IDD_CX_MONITOR_ASSIGN_SWAPCHAIN IddSampleMonitorAssignSwapChain;
 EVT_IDD_CX_MONITOR_UNASSIGN_SWAPCHAIN IddSampleMonitorUnassignSwapChain;
 
@@ -187,8 +165,7 @@ struct IndirectMonitorContextWrapper
     }
 };
 
-// Happens before the compilation
-// macro creates methods for accessing the context structure for all the drivers
+// This macro creates the methods for accessing an IndirectDeviceContextWrapper as a context for a WDF object
 WDF_DECLARE_CONTEXT_TYPE(IndirectDeviceContextWrapper);
 
 WDF_DECLARE_CONTEXT_TYPE(IndirectMonitorContextWrapper);
@@ -205,29 +182,22 @@ extern "C" BOOL WINAPI DllMain(
     return TRUE;
 }
 
-// entry point for a WDF driver - called by OS when driver is loaded - uses the annotations in wdf framework
-// pDriverObject: A pointer to the driver object
-// pRegistryPath: A pointer to the driver's registry path
 _Use_decl_annotations_
 extern "C" NTSTATUS DriverEntry(
     PDRIVER_OBJECT  pDriverObject,
     PUNICODE_STRING pRegistryPath
 )
 {
-
-    //wdf driver config
     WDF_DRIVER_CONFIG Config;
     NTSTATUS Status;
 
-    //wdf driver object attribute
     WDF_OBJECT_ATTRIBUTES Attributes;
-    WDF_OBJECT_ATTRIBUTES_INIT(&Attributes); //a macro
+    WDF_OBJECT_ATTRIBUTES_INIT(&Attributes);
 
     WDF_DRIVER_CONFIG_INIT(&Config,
         IddSampleDeviceAdd
-    ); //a macro - initializing the driver configurations
+    );
 
-    // creating the driver object - getting its status
     Status = WdfDriverCreate(pDriverObject, pRegistryPath, &Attributes, &Config, WDF_NO_HANDLE);
     if (!NT_SUCCESS(Status))
     {
@@ -239,33 +209,23 @@ extern "C" NTSTATUS DriverEntry(
     return Status;
 }
 
-//***TO DO*** - ADD README FILE FOR THIS FUNCTION
 _Use_decl_annotations_
 NTSTATUS IddSampleDeviceAdd(WDFDRIVER Driver, PWDFDEVICE_INIT pDeviceInit)
 {
     TraceEvents(TRACE_LEVEL_ERROR, TRACE_DRIVER , "IddSampleDeviceAdd");
     NTSTATUS Status = STATUS_SUCCESS;
-
-    //specify the power callbacks for WDF driver
     WDF_PNPPOWER_EVENT_CALLBACKS PnpPowerCallbacks;
 
     UNREFERENCED_PARAMETER(Driver);
 
     // Register for power callbacks - in this sample only power-on is needed
-    // Power callbacks are functions that are called by OS when a device's power state changes
-    // allow the driver to take appropriate action when the device's power state changes.
-    WDF_PNPPOWER_EVENT_CALLBACKS_INIT(&PnpPowerCallbacks); //macro
-
-    // only power-on is needed - ***TO DO***
+    WDF_PNPPOWER_EVENT_CALLBACKS_INIT(&PnpPowerCallbacks);
     PnpPowerCallbacks.EvtDeviceD0Entry = IddSampleDeviceD0Entry;
-
-    //specifies the power callbacks that will be called by OS when the device's power state changes.
     WdfDeviceInitSetPnpPowerEventCallbacks(pDeviceInit, &PnpPowerCallbacks);
 
     IDD_CX_CLIENT_CONFIG IddConfig;
-    IDD_CX_CLIENT_CONFIG_INIT(&IddConfig); //macro
+    IDD_CX_CLIENT_CONFIG_INIT(&IddConfig);
 
-    //Add more entry points - ***TO DO***
     // If the driver wishes to handle custom IoDeviceControl requests, it's necessary to use this callback since IddCx
     // redirects IoDeviceControl requests to an internal queue. This sample does not need this.
     // IddConfig.EvtIddCxDeviceIoControl = IddSampleIoDeviceControl;
@@ -279,22 +239,14 @@ NTSTATUS IddSampleDeviceAdd(WDFDRIVER Driver, PWDFDEVICE_INIT pDeviceInit)
     IddConfig.EvtIddCxMonitorAssignSwapChain = IddSampleMonitorAssignSwapChain;
     IddConfig.EvtIddCxMonitorUnassignSwapChain = IddSampleMonitorUnassignSwapChain;
 
-    //Add more entry points - ***TO DO***
-    //THIS IS THE "INITIALIZATION" OF THE "INDIRECT DEVICE" - ***MAIN PART***
-    //using the custom structure of driver (implemented above), and driver's (indirect driver) config pointer
     Status = IddCxDeviceInitConfig(pDeviceInit, &IddConfig);
-
     if (!NT_SUCCESS(Status))
     {
         return Status;
     }
 
-    //Driver object attriutes object
     WDF_OBJECT_ATTRIBUTES Attr;
-
-    //Macro - initialize object attribute
-    WDF_OBJECT_ATTRIBUTES_INIT_CONTEXT_TYPE(&Attr, IndirectDeviceContextWrapper); 
-
+    WDF_OBJECT_ATTRIBUTES_INIT_CONTEXT_TYPE(&Attr, IndirectDeviceContextWrapper);
     Attr.EvtCleanupCallback = [](WDFOBJECT Object)
     {
         // Automatically cleanup the context when the WDF object is about to be deleted
@@ -304,34 +256,58 @@ NTSTATUS IddSampleDeviceAdd(WDFDRIVER Driver, PWDFDEVICE_INIT pDeviceInit)
             pContext->Cleanup();
         }
     };
-    
-    //DRIVER "DEVICE" OBJECT "CREATION" - ***MAIN PART***
-    WDFDEVICE Device = nullptr;
 
-    //(driver custom struct, attribute object of driver, device object)
-    Status = WdfDeviceCreate(&pDeviceInit, &Attr, &Device); 
+    WDFDEVICE Device = nullptr;
+    Status = WdfDeviceCreate(&pDeviceInit, &Attr, &Device);
     if (!NT_SUCCESS(Status))
     {
         return Status;
     }
 
+
     Status = IddCxDeviceInitialize(Device);
 
-    // Create a new device context object and attach it to the WDF device object - ***?????*** - Context Object??
+    // Create a new device context object and attach it to the WDF device object
     auto* pContext = WdfObjectGet_IndirectDeviceContextWrapper(Device);
     pContext->pContext = new IndirectDeviceContext(Device);
+
+
+  struct DriverProperties {
+    DriverProperties(int n) { num_displays = n; }
+    int num_displays;
+  };
+DriverProperties SomeValue(0);
+
+
+ULONG RequiredSize = 0;
+DEVPROPTYPE propType{};
+
+WDF_DEVICE_PROPERTY_DATA  propertyRead;
+WDF_DEVICE_PROPERTY_DATA_INIT(&propertyRead,&CustomProp);
+
+NTSTATUS propertyStatus = WdfDeviceQueryPropertyEx(Device, &propertyRead, sizeof(DriverProperties), &SomeValue, &RequiredSize, &propType);
+TraceEvents(TRACE_LEVEL_ERROR, TRACE_DRIVER , "propType, 0x%x", propType);
+TraceEvents(TRACE_LEVEL_ERROR, TRACE_DRIVER , "RequiredSize, 0x%x", RequiredSize);
+
+TraceEvents(TRACE_LEVEL_ERROR, TRACE_DRIVER , "propertyStatus, %!STATUS!", propertyStatus);
+if (propertyStatus != STATUS_SUCCESS) {
+    TraceEvents(TRACE_LEVEL_ERROR, TRACE_DRIVER , "Error 0x%08x retrieving property.\n", propertyStatus);
+}else{
+    TraceEvents(TRACE_LEVEL_ERROR, TRACE_DRIVER , "Property value: 0x%08x\n", RequiredSize);
+
+}
 
     return Status;
 }
 
-
-// Here's where the WDF device is put to D0 (start state)
 _Use_decl_annotations_
 NTSTATUS IddSampleDeviceD0Entry(WDFDEVICE Device, WDF_POWER_DEVICE_STATE PreviousState)
 {
+    
     UNREFERENCED_PARAMETER(PreviousState);
 
     // This function is called by WDF to start the device in the fully-on power state.
+
     auto* pContext = WdfObjectGet_IndirectDeviceContextWrapper(Device);
     pContext->pContext->InitAdapter();
 
@@ -339,15 +315,7 @@ NTSTATUS IddSampleDeviceD0Entry(WDFDEVICE Device, WDF_POWER_DEVICE_STATE Previou
 }
 
 #pragma region Direct3DDevice
-                                         //**A BACKGROUNG ON D3D DEVICE**// 
-   
-//D3D device is a software interface that allows applications to interact with the GPU on a Windows computer. 
-//D3D devices are used to render 2D and 3D graphics, and they provide a high level of control over the GPU.
 
-//A DXGI factory is a software interface that allows applications to interact with the DXGI on a Windows. 
-//DXGI is a set of APIs that provide a unified interface for accessing graphics hardware on Windows.
-
-//AdapterLuid:  variable that identifies the render adapter that the D3D device object will use
 Direct3DDevice::Direct3DDevice(LUID AdapterLuid) : AdapterLuid(AdapterLuid)
 {
 
@@ -360,21 +328,13 @@ Direct3DDevice::Direct3DDevice()
 
 HRESULT Direct3DDevice::Init()
 {
-    
-    //The DXGI factory could be cached, but if a new render adapter appears on the system, a new factory needs to be
-    //created. If caching is desired, check DxgiFactory->IsCurrent() each time and recreate the factory if !IsCurrent.
-
-    ////***TO DO*** - Implement this functionality for further flexibility - ***SOLUTION GIVEN***
-    //DXGI factory is used to enumerate the render adapters on the system
-    //And if a new render adapter appears 
-    //The factory will not be aware of it unless it is recreated.
+    // The DXGI factory could be cached, but if a new render adapter appears on the system, a new factory needs to be
+    // created. If caching is desired, check DxgiFactory->IsCurrent() each time and recreate the factory if !IsCurrent.
     HRESULT hr = CreateDXGIFactory2(0, IID_PPV_ARGS(&DxgiFactory));
     if (FAILED(hr))
     {
         return hr;
     }
-
-    //***TO DO*** MAKE CHANGES HERE??
 
     // Find the specified render adapter
     hr = DxgiFactory->EnumAdapterByLuid(AdapterLuid, IID_PPV_ARGS(&Adapter));
@@ -399,48 +359,27 @@ HRESULT Direct3DDevice::Init()
 
 #pragma region SwapChainProcessor
 
-// A SwapChainProcessor is a class that is used to process frames from a swap chain.
-// A swap chain is a "sequence of buffers (frames)" that are used to "render graphics to the display".
-// The SwapChainProcessor class is responsible for (1) acquiring a frame from the swap chain, 
-// (2) rendering graphics to the frame, (3) and presenting the frame to the display.
-
-
-
-// Contructor for swap chain processor 
-// hSwapChain: A handle to the swap chain.
-// Device: A pointer to the Direct3D device.
-// NewFrameEvent: A handle to an event that is signaled when a new frame is available
 SwapChainProcessor::SwapChainProcessor(IDDCX_SWAPCHAIN hSwapChain, shared_ptr<Direct3DDevice> Device, HANDLE NewFrameEvent)
     : m_hSwapChain(hSwapChain), m_Device(Device), m_hAvailableBufferEvent(NewFrameEvent)
 {
     m_hTerminateEvent.Attach(CreateEvent(nullptr, FALSE, FALSE, nullptr));
 
     // Immediately create and run the swap-chain processing thread, passing 'this' as the thread parameter
-    // m_hThread: the main thread is defined here, and is immediately put to work using 'this' keyword
     m_hThread.Attach(CreateThread(nullptr, 0, RunThread, this, 0, nullptr));
 }
 
-//Destructor for the SwapChainProcessor class
 SwapChainProcessor::~SwapChainProcessor()
 {
     // Alert the swap-chain processing thread to terminate
-    // Setting the main event to a thread responsible for termination of the Swap Chain Process
     SetEvent(m_hTerminateEvent.Get());
 
     if (m_hThread.Get())
     {
         // Wait for the thread to terminate
-        // Function is used to wait for the SwapChainProcessor thread to terminate.
-        // The function will not return until the thread has terminated, HENCE 'INFINITE'
         WaitForSingleObject(m_hThread.Get(), INFINITE);
     }
 }
 
-// LPVOID: a generic datatype to point to any kind of pointer
-// Here Argument: Points to a pointer to the SwapChainProcessor's object
-
-// Run(): This method is called using SwapChainProcessor's object - Is the main loop in the whole Class  
-// Working: acquires a frame from swap chain, renders graphics to frame, and presents frame to display.
 DWORD CALLBACK SwapChainProcessor::RunThread(LPVOID Argument)
 {
     reinterpret_cast<SwapChainProcessor*>(Argument)->Run();
@@ -454,9 +393,6 @@ void SwapChainProcessor::Run()
     DWORD AvTask = 0;
     HANDLE AvTaskHandle = AvSetMmThreadCharacteristicsW(L"Distribution", &AvTask);
 
-    //responsible for acquiring a frame from the swap chain, 
-    //rendering graphics to the frame, 
-    //and presenting the frame to the display
     RunCore();
 
     // Always delete the swap-chain object when swap-chain processing loop terminates in order to kick the system to
@@ -467,7 +403,6 @@ void SwapChainProcessor::Run()
     AvRevertMmThreadCharacteristics(AvTaskHandle);
 }
 
-//Implementation of the main function ***IMPORTANT***  AND  ***TO-DO***
 void SwapChainProcessor::RunCore()
 {
     // Get the DXGI device interface
@@ -490,13 +425,9 @@ void SwapChainProcessor::RunCore()
     // Acquire and release buffers in a loop
     for (;;)
     {
-        // ***How is it able to detect the DXGI factory?***//
-        //IDDCx and WDF already helped creating a ID device, and after D0 state an adapter is also created
-        //This IDDCx when creating a device initializes the D3D device (main concept/part of ID device), 
-        //and hence the DXGI factory was initialized for the given enumerated adapter(s)
         ComPtr<IDXGIResource> AcquiredBuffer;
 
-        // Ask for the next buffer from the producer - One BUFFER contains One FRAME!!
+        // Ask for the next buffer from the producer
         IDARG_OUT_RELEASEANDACQUIREBUFFER Buffer = {};
         hr = IddCxSwapChainReleaseAndAcquireBuffer(m_hSwapChain, &Buffer);
 
@@ -512,7 +443,7 @@ void SwapChainProcessor::RunCore()
             DWORD WaitResult = WaitForMultipleObjects(ARRAYSIZE(WaitHandles), WaitHandles, FALSE, 16);
             if (WaitResult == WAIT_OBJECT_0 || WaitResult == WAIT_TIMEOUT)
             {
-                // We have a new buffer, so try the AcquireBuffer again - GO on line #498
+                // We have a new buffer, so try the AcquireBuffer again
                 continue;
             }
             else if (WaitResult == WAIT_OBJECT_0 + 1)
@@ -592,7 +523,7 @@ IndirectDeviceContext::~IndirectDeviceContext()
 void IndirectDeviceContext::InitAdapter()
 {
     // ==============================
-    // ***TODO:**** Update the below diagnostic information in accordance with the target hardware. The strings and version
+    // TODO: Update the below diagnostic information in accordance with the target hardware. The strings and version
     // numbers are used for telemetry and may be displayed to the user in some situations.
     //
     // This is also where static per-adapter capabilities are determined.
@@ -646,7 +577,7 @@ void IndirectDeviceContext::InitAdapter()
 void IndirectDeviceContext::FinishInit(UINT ConnectorIndex)
 {
     // ==============================
-    // ***TODO***: In a real driver, the EDID should be retrieved dynamically from a connected physical monitor. The EDIDs
+    // TODO: In a real driver, the EDID should be retrieved dynamically from a connected physical monitor. The EDIDs
     // provided here are purely for demonstration.
     // Monitor manufacturers are required to correctly fill in physical monitor attributes in order to allow the OS
     // to optimize settings like viewing distance and scale factor. Manufacturers should also use a unique serial
@@ -782,7 +713,7 @@ _Use_decl_annotations_
 NTSTATUS IddSampleParseMonitorDescription(const IDARG_IN_PARSEMONITORDESCRIPTION* pInArgs, IDARG_OUT_PARSEMONITORDESCRIPTION* pOutArgs)
 {
     // ==============================
-    // ***TODO:*** In a real driver, this function would be called to generate monitor modes for an EDID by parsing it. In
+    // TODO: In a real driver, this function would be called to generate monitor modes for an EDID by parsing it. In
     // this sample driver, we hard-code the EDID, so this function can generate known modes.
     // ==============================
 

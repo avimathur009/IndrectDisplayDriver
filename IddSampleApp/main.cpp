@@ -5,13 +5,11 @@
 #include <swdevice.h>
 #include <conio.h>
 #include <wrl.h>
+#include <initguid.h>
+#include <Devpropdef.h>
 
-//HSWDEVICE is a typedef for a 'handle' data-type: special type of pointer that is used to interact with Software device in the Windows operating system
-//HRESULT is a data type that represents the completion status of a function: 32 bit value (devided into 3 parts)
-//PVOID is a pointer to a generic type: typedef for the void * type (used when we don't want to change function, when not sure of the data type to pass)
-//PCWSTR is a type that represents a pointer to a constant wide character string: stored using 16-bit characters
-//_In_ : Passed by Value and Value can't be changes by function
-//_In_opt_ : Passed by Value and Value may also be Null
+DEFINE_DEVPROPKEY (CustomProp, 0xde5c254e, 0xab1c, 0xeffd, 0x80, 0x20, 0x67, 0xd1, 0x46, 0xa8,0x50,0xe0,2);
+
 
 VOID WINAPI
 CreationCallback(
@@ -21,37 +19,25 @@ CreationCallback(
     _In_opt_ PCWSTR pszDeviceInstanceId
     )
 {
-    //getting the event handle from context pointer by derefrencing
-    //event handle for? the event handle for the software device that was created (IDD??)
-    HANDLE hEvent = *(HANDLE*) pContext; 
+    HANDLE hEvent = *(HANDLE*) pContext;
 
     SetEvent(hEvent);
-
-    //Indicating unused parameters
     UNREFERENCED_PARAMETER(hSwDevice);
     UNREFERENCED_PARAMETER(hrCreateResult);
     UNREFERENCED_PARAMETER(pszDeviceInstanceId);
 }
-//Using the standard calling convention: __cdecl (Is explicit specification necissary?)
+
 int __cdecl main(int argc, wchar_t *argv[])
 {
     UNREFERENCED_PARAMETER(argc);
     UNREFERENCED_PARAMETER(argv);
 
-    //creates a handle to an event object (See 4 parameters) 
     HANDLE hEvent = CreateEvent(nullptr, FALSE, FALSE, nullptr);
-
-    //HSWDEVICE type is a handle to a software device object (used to represent hardware devices in the Win os)
     HSWDEVICE hSwDevice;
-
-    //used to provide information about a software device object when it is created (Version, DeviceObjectName, DeviceObjectDescription, etc.)
     SW_DEVICE_CREATE_INFO createInfo = { 0 };
-
-    //PCWSTR type is used to represent strings that are used by Windows APIs (win OS requires arguments to be passed as these types)
     PCWSTR description = L"Idd Sample Driver";
 
     // These match the Pnp id's in the inf file so OS will load the driver when the device is created    
-    // SEE "IddSampleDriver.inf" file, line #20 (it is hard-coded for now, but need to edit that)
     PCWSTR instanceId = L"IddSampleDriver";
     PCWSTR hardwareIds = L"IddSampleDriver\0\0";
     PCWSTR compatibleIds = L"IddSampleDriver\0\0";
@@ -66,18 +52,26 @@ int __cdecl main(int argc, wchar_t *argv[])
                                  SWDeviceCapabilitiesSilentInstall |
                                  SWDeviceCapabilitiesDriverRequired;
 
-    // Check if the enumeration was successful - Enumeration of the device is initialized? (S_OK for success)
-    // CreationCallback - responsible for the status for the actual enumeration of the device 
-    // after OS calls after PnP enumerates the device
-    // hSwDevice - pointer to the actual hardware that is created
-    HRESULT hr = SwDeviceCreate(L"IddSampleDriver",
-                                L"HTREE\\ROOT\\0",
-                                &createInfo,
-                                0,
-                                nullptr,
-                                CreationCallback,
-                                &hEvent,
-                                &hSwDevice);
+  struct DriverProperties {
+    DriverProperties(int n) { num_displays = n; }
+    int num_displays;
+  };
+
+  DriverProperties p(2);
+
+  DEVPROPERTY properties[1];
+  DEVPROPERTY& property = properties[0];
+  property.Type = DEVPROP_TYPE_BINARY;
+  property.CompKey.Store = DEVPROP_STORE_SYSTEM;
+  property.CompKey.Key = CustomProp;
+  property.CompKey.LocaleName = L"DeviceInstanceId";
+  property.BufferSize = sizeof(DriverProperties);
+  property.Buffer = &p;
+
+  // Create the device
+  HRESULT hr =
+      SwDeviceCreate(L"IddSampleDriver", L"HTREE\\ROOT\\0", &createInfo, 1,
+                     properties, CreationCallback, &hEvent, &hSwDevice);
     if (FAILED(hr))
     {
         printf("SwDeviceCreate failed with 0x%lx\n", hr);
