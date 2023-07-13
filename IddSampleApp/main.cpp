@@ -11,6 +11,7 @@
 // Defines a GUID to uniquely identify the unified property for display configuration.
 // See: https://learn.microsoft.com/en-us/windows-hardware/drivers/wdf/accessing-the-unified-device-property-model
 // This GUID should match the same one used to query the property in the driver code.
+// TODO: This GUID was pulled from sample code. Generate a new unique one.
 DEFINE_DEVPROPKEY (DisplayConfigurationProperty, 0xde5c254e, 0xab1c, 0xeffd, 0x80, 0x20, 0x67, 0xd1, 0x46, 0xa8,0x50,0xe0,2);
 // Structure which holds data to be transmitted to the driver. The driver code should have an identical structure.
 struct DriverProperties {

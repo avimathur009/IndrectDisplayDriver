@@ -28,6 +28,7 @@ using namespace Microsoft::WRL;
 // Defines a GUID to uniquely identify the unified property for display configuration.
 // See: https://learn.microsoft.com/en-us/windows-hardware/drivers/wdf/accessing-the-unified-device-property-model
 // This GUID should match the same one used to set the property in the app code.
+// TODO: This GUID was pulled from sample code. Generate a new unique one.
 DEFINE_DEVPROPKEY(DisplayConfigurationProperty, 0xde5c254e, 0xab1c, 0xeffd, 0x80, 0x20, 0x67, 0xd1, 0x46, 0xa8, 0x50, 0xe0, 2);
 // Structure which holds data to be transmitted to the driver. The app code should have an identical structure.
 struct DriverProperties
@@ -283,7 +284,7 @@ _Use_decl_annotations_
         TraceEvents(TRACE_LEVEL_ERROR, TRACE_DRIVER, "WdfDeviceQueryPropertyEx failed: %!STATUS!", Status);
         return Status;
     }
-    
+
     TraceEvents(TRACE_LEVEL_ERROR, TRACE_DRIVER, "num_displays: %i", ConfiguredProperties.num_displays);
 
     return Status;
