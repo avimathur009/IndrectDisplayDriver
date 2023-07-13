@@ -8,8 +8,15 @@
 #include <initguid.h>
 #include <Devpropdef.h>
 
-DEFINE_DEVPROPKEY (CustomProp, 0xde5c254e, 0xab1c, 0xeffd, 0x80, 0x20, 0x67, 0xd1, 0x46, 0xa8,0x50,0xe0,2);
-
+// Defines a GUID to uniquely identify the unified property for display configuration.
+// See: https://learn.microsoft.com/en-us/windows-hardware/drivers/wdf/accessing-the-unified-device-property-model
+// This GUID should match the same one used to query the property in the driver code.
+DEFINE_DEVPROPKEY (DisplayConfigurationProperty, 0xde5c254e, 0xab1c, 0xeffd, 0x80, 0x20, 0x67, 0xd1, 0x46, 0xa8,0x50,0xe0,2);
+// Structure which holds data to be transmitted to the driver. The driver code should have an identical structure.
+struct DriverProperties {
+    DriverProperties(int n) { num_displays = n; }
+    int num_displays;
+};
 
 VOID WINAPI
 CreationCallback(
@@ -52,19 +59,15 @@ int __cdecl main(int argc, wchar_t *argv[])
                                  SWDeviceCapabilitiesSilentInstall |
                                  SWDeviceCapabilitiesDriverRequired;
 
-  struct DriverProperties {
-    DriverProperties(int n) { num_displays = n; }
-    int num_displays;
-  };
-
+  
+  // Set configuration properties to send to the driver.
   DriverProperties p(2);
-
   DEVPROPERTY properties[1];
   DEVPROPERTY& property = properties[0];
   property.Type = DEVPROP_TYPE_BINARY;
   property.CompKey.Store = DEVPROP_STORE_SYSTEM;
-  property.CompKey.Key = CustomProp;
-  property.CompKey.LocaleName = L"DeviceInstanceId";
+  property.CompKey.Key = DisplayConfigurationProperty;
+  property.CompKey.LocaleName = NULL;
   property.BufferSize = sizeof(DriverProperties);
   property.Buffer = &p;
 
